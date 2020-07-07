@@ -59,7 +59,7 @@ function (_React$Component) {
       });
     }
 
-    supportedProps.classList = [classes.view, props.classList];
+    supportedProps.classList = [classes.view, this.props.classList];
     supportedProps.ref = this.props.forwardedRef;
     supportedProps.style = _StyleSheet.default.compose(hasTextAncestor && styles.inline, this.props.style);
 
