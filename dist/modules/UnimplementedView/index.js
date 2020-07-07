@@ -26,8 +26,6 @@ function (_React$Component) {
   var _proto = UnimplementedView.prototype;
 
   _proto.setNativeProps = function setNativeProps() {// Do nothing.
-    // This method is required in order to use this view as a Touchable* child.
-    // See ensureComponentIsNative.js for more info
   };
 
   _proto.render = function render() {

@@ -233,6 +233,16 @@ function (_React$PureComponent) {
     if (this._listRef) {
       return this._listRef.getScrollResponder();
     }
+  }
+  /**
+   * Provides a reference to the underlying host component
+   */
+  ;
+
+  _proto.getNativeScrollRef = function getNativeScrollRef() {
+    if (this._listRef) {
+      return this._listRef.getScrollRef();
+    }
   };
 
   _proto.getScrollableNode = function getScrollableNode() {

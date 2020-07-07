@@ -6,6 +6,6 @@
  *
  * 
  */
-import * as React from 'react';
-var TextAncestorContext = React.createContext(false);
+import { createContext } from 'react';
+var TextAncestorContext = createContext(false);
 export default TextAncestorContext;

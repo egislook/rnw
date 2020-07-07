@@ -3,7 +3,7 @@
 exports.__esModule = true;
 exports.default = void 0;
 
-var _ReactNativePropRegistry = _interopRequireDefault(require("../../modules/ReactNativePropRegistry"));
+var _ReactNativePropRegistry = _interopRequireDefault(require("./ReactNativePropRegistry"));
 
 var _flattenStyle = _interopRequireDefault(require("./flattenStyle"));
 

@@ -4,8 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- * @format
  * 
+ * @format
  */
 'use strict';
 
@@ -15,123 +15,81 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-import createReactClass from 'create-react-class';
-import ensurePositiveDelayProps from '../Touchable/ensurePositiveDelayProps';
 import * as React from 'react';
-import Touchable from '../Touchable';
-import View from '../View';
-var PRESS_RETENTION_OFFSET = {
-  top: 20,
-  left: 20,
-  right: 20,
-  bottom: 30
+import { useMemo, useRef } from 'react';
+import pick from '../../modules/pick';
+import setAndForwardRef from '../../modules/setAndForwardRef';
+import usePressEvents from '../../hooks/usePressEvents';
+var forwardPropsList = {
+  accessibilityLabel: true,
+  accessibilityLiveRegion: true,
+  accessibilityRole: true,
+  accessibilityState: true,
+  accessibilityValue: true,
+  accessible: true,
+  children: true,
+  disabled: true,
+  focusable: true,
+  importantForAccessibility: true,
+  nativeID: true,
+  onBlur: true,
+  onFocus: true,
+  onLayout: true,
+  testID: true
 };
-var OVERRIDE_PROPS = ['accessibilityLabel', 'accessibilityHint', 'accessibilityIgnoresInvertColors', 'accessibilityRole', 'accessibilityState', 'hitSlop', 'nativeID', 'onBlur', 'onFocus', 'onLayout', 'testID'];
 
-/**
- * Do not use unless you have a very good reason. All elements that
- * respond to press should have a visual feedback when touched.
- *
- * TouchableWithoutFeedback supports only one child.
- * If you wish to have several child components, wrap them in a View.
- */
-// eslint-disable-next-line react/prefer-es6-class
-var TouchableWithoutFeedback = createReactClass({
-  displayName: 'TouchableWithoutFeedback',
-  mixins: [Touchable.Mixin],
-  getInitialState: function getInitialState() {
-    return this.touchableGetInitialState();
-  },
-  componentDidMount: function componentDidMount() {
-    ensurePositiveDelayProps(this.props);
-  },
-  UNSAFE_componentWillReceiveProps: function UNSAFE_componentWillReceiveProps(nextProps) {
-    ensurePositiveDelayProps(nextProps);
-  },
+var pickProps = function pickProps(props) {
+  return pick(props, forwardPropsList);
+};
 
-  /**
-   * `Touchable.Mixin` self callbacks. The mixin will invoke these if they are
-   * defined on your component.
-   */
-  touchableHandlePress: function touchableHandlePress(e) {
-    this.props.onPress && this.props.onPress(e);
-  },
-  touchableHandleActivePressIn: function touchableHandleActivePressIn(e) {
-    this.props.onPressIn && this.props.onPressIn(e);
-  },
-  touchableHandleActivePressOut: function touchableHandleActivePressOut(e) {
-    this.props.onPressOut && this.props.onPressOut(e);
-  },
-  touchableHandleLongPress: function touchableHandleLongPress(e) {
-    this.props.onLongPress && this.props.onLongPress(e);
-  },
-  touchableGetPressRectOffset: function touchableGetPressRectOffset() {
-    // $FlowFixMe Invalid prop usage
-    return this.props.pressRetentionOffset || PRESS_RETENTION_OFFSET;
-  },
-  touchableGetHitSlop: function touchableGetHitSlop() {
-    return this.props.hitSlop;
-  },
-  touchableGetHighlightDelayMS: function touchableGetHighlightDelayMS() {
-    return this.props.delayPressIn || 0;
-  },
-  touchableGetLongPressDelayMS: function touchableGetLongPressDelayMS() {
-    return this.props.delayLongPress === 0 ? 0 : this.props.delayLongPress || 500;
-  },
-  touchableGetPressOutDelayMS: function touchableGetPressOutDelayMS() {
-    return this.props.delayPressOut || 0;
-  },
-  render: function render() {
-    // Note(avik): remove dynamic typecast once Flow has been upgraded
-    // $FlowFixMe(>=0.41.0)
-    // eslint-disable-next-line
-    var child = React.Children.only(this.props.children);
-    var children = child.props.children;
-
-    if (Touchable.TOUCH_TARGET_DEBUG && child.type === View) {
-      children = React.Children.toArray(children);
-      children.push(Touchable.renderDebugView({
-        color: 'red',
-        hitSlop: this.props.hitSlop
-      }));
+function TouchableWithoutFeedback(props, forwardedRef) {
+  var accessible = props.accessible,
+      delayPressIn = props.delayPressIn,
+      delayPressOut = props.delayPressOut,
+      delayLongPress = props.delayLongPress,
+      disabled = props.disabled,
+      focusable = props.focusable,
+      onLongPress = props.onLongPress,
+      onPress = props.onPress,
+      onPressIn = props.onPressIn,
+      onPressOut = props.onPressOut,
+      rejectResponderTermination = props.rejectResponderTermination;
+  var hostRef = useRef(null);
+  var setRef = setAndForwardRef({
+    getForwardedRef: function getForwardedRef() {
+      return forwardedRef;
+    },
+    setLocalRef: function setLocalRef(hostNode) {
+      hostRef.current = hostNode;
     }
+  });
+  var pressConfig = useMemo(function () {
+    return {
+      cancelable: !rejectResponderTermination,
+      disabled: disabled,
+      delayLongPress: delayLongPress,
+      delayPressStart: delayPressIn,
+      delayPressEnd: delayPressOut,
+      onLongPress: onLongPress,
+      onPress: onPress,
+      onPressStart: onPressIn,
+      onPressEnd: onPressOut
+    };
+  }, [disabled, delayPressIn, delayPressOut, delayLongPress, onLongPress, onPress, onPressIn, onPressOut, rejectResponderTermination]);
+  var pressEventHandlers = usePressEvents(hostRef, pressConfig);
+  var element = React.Children.only(props.children);
+  var children = [element.props.children];
+  var supportedProps = pickProps(props);
+  supportedProps.accessible = accessible !== false;
+  supportedProps.accessibilityState = _objectSpread({
+    disabled: disabled
+  }, props.accessibilityState);
+  supportedProps.focusable = focusable !== false && onPress !== undefined;
+  supportedProps.ref = setRef;
+  var elementProps = Object.assign(supportedProps, pressEventHandlers);
+  return React.cloneElement.apply(React, [element, elementProps].concat(children));
+}
 
-    var overrides = {};
-
-    for (var _iterator = OVERRIDE_PROPS, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-      var _ref;
-
-      if (_isArray) {
-        if (_i >= _iterator.length) break;
-        _ref = _iterator[_i++];
-      } else {
-        _i = _iterator.next();
-        if (_i.done) break;
-        _ref = _i.value;
-      }
-
-      var prop = _ref;
-
-      if (this.props[prop] !== undefined) {
-        overrides[prop] = this.props[prop];
-      }
-    }
-
-    return React.cloneElement(child, _objectSpread({}, overrides, {
-      accessible: this.props.accessible !== false,
-      //clickable:
-      //  this.props.clickable !== false && this.props.onPress !== undefined,
-      //onClick: this.touchableHandlePress,
-      onKeyDown: this.touchableHandleKeyEvent,
-      onKeyUp: this.touchableHandleKeyEvent,
-      onStartShouldSetResponder: this.touchableHandleStartShouldSetResponder,
-      onResponderTerminationRequest: this.touchableHandleResponderTerminationRequest,
-      onResponderGrant: this.touchableHandleResponderGrant,
-      onResponderMove: this.touchableHandleResponderMove,
-      onResponderRelease: this.touchableHandleResponderRelease,
-      onResponderTerminate: this.touchableHandleResponderTerminate,
-      children: children
-    }));
-  }
-});
-export default TouchableWithoutFeedback;
+var MemoedTouchableWithoutFeedback = React.memo(React.forwardRef(TouchableWithoutFeedback));
+MemoedTouchableWithoutFeedback.displayName = 'TouchableWithoutFeedback';
+export default MemoedTouchableWithoutFeedback;

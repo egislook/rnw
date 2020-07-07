@@ -3,17 +3,21 @@
 exports.__esModule = true;
 exports.default = void 0;
 
-var _applyLayout = _interopRequireDefault(require("../../modules/applyLayout"));
-
-var _applyNativeMethods = _interopRequireDefault(require("../../modules/applyNativeMethods"));
+var React = _interopRequireWildcard(require("react"));
 
 var _createElement = _interopRequireDefault(require("../createElement"));
 
 var _css = _interopRequireDefault(require("../StyleSheet/css"));
 
-var _filterSupportedProps = _interopRequireDefault(require("../View/filterSupportedProps"));
+var _pick = _interopRequireDefault(require("../../modules/pick"));
 
-var _react = _interopRequireDefault(require("react"));
+var _setAndForwardRef = _interopRequireDefault(require("../../modules/setAndForwardRef"));
+
+var _useElementLayout = _interopRequireDefault(require("../../hooks/useElementLayout"));
+
+var _usePlatformMethods = _interopRequireDefault(require("../../hooks/usePlatformMethods"));
+
+var _useResponderEvents = _interopRequireDefault(require("../../hooks/useResponderEvents"));
 
 var _StyleSheet = _interopRequireDefault(require("../StyleSheet"));
 
@@ -21,76 +25,153 @@ var _TextAncestorContext = _interopRequireDefault(require("./TextAncestorContext
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function _getRequireWildcardCache() { return cache; }; return cache; }
 
-var Text =
-/*#__PURE__*/
-function (_React$Component) {
-  _inheritsLoose(Text, _React$Component);
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
-  function Text() {
-    return _React$Component.apply(this, arguments) || this;
-  }
+/**
+ * Copyright (c) Nicolas Gallagher.
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ * 
+ */
+var forwardPropsList = {
+  accessibilityLabel: true,
+  accessibilityLiveRegion: true,
+  accessibilityRole: true,
+  accessibilityState: true,
+  accessibilityValue: true,
+  accessible: true,
+  children: true,
+  classList: true,
+  dir: true,
+  importantForAccessibility: true,
+  lang: true,
+  nativeID: true,
+  onBlur: true,
+  onClick: true,
+  onClickCapture: true,
+  onContextMenu: true,
+  onFocus: true,
+  onKeyDown: true,
+  onKeyUp: true,
+  onTouchCancel: true,
+  onTouchCancelCapture: true,
+  onTouchEnd: true,
+  onTouchEndCapture: true,
+  onTouchMove: true,
+  onTouchMoveCapture: true,
+  onTouchStart: true,
+  onTouchStartCapture: true,
+  pointerEvents: true,
+  ref: true,
+  style: true,
+  testID: true,
+  // unstable
+  dataSet: true,
+  onMouseDown: true,
+  onMouseEnter: true,
+  onMouseLeave: true,
+  onMouseMove: true,
+  onMouseOver: true,
+  onMouseOut: true,
+  onMouseUp: true,
+  onScroll: true,
+  onWheel: true,
+  href: true,
+  rel: true,
+  target: true
+};
 
-  var _proto = Text.prototype;
+var pickProps = function pickProps(props) {
+  return (0, _pick.default)(props, forwardPropsList);
+};
 
-  _proto.renderText = function renderText(hasTextAncestor) {
-    var _this$props = this.props,
-        dir = _this$props.dir,
-        forwardedRef = _this$props.forwardedRef,
-        numberOfLines = _this$props.numberOfLines,
-        onPress = _this$props.onPress,
-        selectable = _this$props.selectable,
-        style = _this$props.style;
-    var supportedProps = (0, _filterSupportedProps.default)(this.props);
+var Text = (0, React.forwardRef)(function (props, forwardedRef) {
+  var dir = props.dir,
+      numberOfLines = props.numberOfLines,
+      onClick = props.onClick,
+      onLayout = props.onLayout,
+      onPress = props.onPress,
+      onMoveShouldSetResponder = props.onMoveShouldSetResponder,
+      onMoveShouldSetResponderCapture = props.onMoveShouldSetResponderCapture,
+      onResponderEnd = props.onResponderEnd,
+      onResponderGrant = props.onResponderGrant,
+      onResponderMove = props.onResponderMove,
+      onResponderReject = props.onResponderReject,
+      onResponderRelease = props.onResponderRelease,
+      onResponderStart = props.onResponderStart,
+      onResponderTerminate = props.onResponderTerminate,
+      onResponderTerminationRequest = props.onResponderTerminationRequest,
+      onScrollShouldSetResponder = props.onScrollShouldSetResponder,
+      onScrollShouldSetResponderCapture = props.onScrollShouldSetResponderCapture,
+      onSelectionChangeShouldSetResponder = props.onSelectionChangeShouldSetResponder,
+      onSelectionChangeShouldSetResponderCapture = props.onSelectionChangeShouldSetResponderCapture,
+      onStartShouldSetResponder = props.onStartShouldSetResponder,
+      onStartShouldSetResponderCapture = props.onStartShouldSetResponderCapture,
+      selectable = props.selectable;
+  var hasTextAncestor = (0, React.useContext)(_TextAncestorContext.default);
+  var hostRef = (0, React.useRef)(null);
+  var setRef = (0, _setAndForwardRef.default)({
+    getForwardedRef: function getForwardedRef() {
+      return forwardedRef;
+    },
+    setLocalRef: function setLocalRef(hostNode) {
+      hostRef.current = hostNode;
+    }
+  });
+  var classList = [classes.text, hasTextAncestor === true && classes.textHasAncestor, numberOfLines === 1 && classes.textOneLine, numberOfLines != null && numberOfLines > 1 && classes.textMultiLine];
+  var style = [props.style, numberOfLines != null && numberOfLines > 1 && {
+    WebkitLineClamp: numberOfLines
+  }, selectable === false && styles.notSelectable, onPress && styles.pressable];
+  (0, _useElementLayout.default)(hostRef, onLayout);
+  (0, _usePlatformMethods.default)(hostRef, classList, style);
+  (0, _useResponderEvents.default)(hostRef, {
+    onMoveShouldSetResponder: onMoveShouldSetResponder,
+    onMoveShouldSetResponderCapture: onMoveShouldSetResponderCapture,
+    onResponderEnd: onResponderEnd,
+    onResponderGrant: onResponderGrant,
+    onResponderMove: onResponderMove,
+    onResponderReject: onResponderReject,
+    onResponderRelease: onResponderRelease,
+    onResponderStart: onResponderStart,
+    onResponderTerminate: onResponderTerminate,
+    onResponderTerminationRequest: onResponderTerminationRequest,
+    onScrollShouldSetResponder: onScrollShouldSetResponder,
+    onScrollShouldSetResponderCapture: onScrollShouldSetResponderCapture,
+    onSelectionChangeShouldSetResponder: onSelectionChangeShouldSetResponder,
+    onSelectionChangeShouldSetResponderCapture: onSelectionChangeShouldSetResponderCapture,
+    onStartShouldSetResponder: onStartShouldSetResponder,
+    onStartShouldSetResponderCapture: onStartShouldSetResponderCapture
+  });
 
-    if (onPress) {
-      supportedProps.accessible = true;
-      supportedProps.onClick = this._createPressHandler(onPress);
-      supportedProps.onKeyDown = this._createEnterHandler(onPress);
+  function handleClick(e) {
+    if (onClick != null) {
+      onClick(e);
     }
 
-    supportedProps.classList = [classes.text, hasTextAncestor === true && classes.textHasAncestor, numberOfLines === 1 && classes.textOneLine, numberOfLines != null && numberOfLines > 1 && classes.textMultiLine]; // allow browsers to automatically infer the language writing direction
-
-    supportedProps.dir = dir !== undefined ? dir : 'auto';
-    supportedProps.ref = forwardedRef;
-    supportedProps.style = [style, numberOfLines != null && numberOfLines > 1 && {
-      WebkitLineClamp: numberOfLines
-    }, selectable === false && styles.notSelectable, onPress && styles.pressable];
-    var component = hasTextAncestor ? 'span' : 'div';
-    return (0, _createElement.default)(component, supportedProps);
-  };
-
-  _proto.render = function render() {
-    var _this = this;
-
-    return _react.default.createElement(_TextAncestorContext.default.Consumer, null, function (hasTextAncestor) {
-      var element = _this.renderText(hasTextAncestor);
-
-      return hasTextAncestor ? element : _react.default.createElement(_TextAncestorContext.default.Provider, {
-        value: true
-      }, element);
-    });
-  };
-
-  _proto._createEnterHandler = function _createEnterHandler(fn) {
-    return function (e) {
-      if (e.keyCode === 13) {
-        fn && fn(e);
-      }
-    };
-  };
-
-  _proto._createPressHandler = function _createPressHandler(fn) {
-    return function (e) {
+    if (onClick == null && onPress != null) {
       e.stopPropagation();
-      fn && fn(e);
-    };
-  };
+      onPress(e);
+    }
+  }
 
-  return Text;
-}(_react.default.Component);
+  var component = hasTextAncestor ? 'span' : 'div';
+  var supportedProps = pickProps(props);
+  supportedProps.classList = classList; // 'auto' by default allows browsers to infer writing direction
 
+  supportedProps.dir = dir !== undefined ? dir : 'auto';
+  supportedProps.onClick = handleClick;
+  supportedProps.ref = setRef;
+  supportedProps.style = style;
+  var element = (0, _createElement.default)(component, supportedProps);
+  return hasTextAncestor ? element : React.createElement(_TextAncestorContext.default.Provider, {
+    value: true
+  }, element);
+});
 Text.displayName = 'Text';
 
 var classes = _css.default.create({
@@ -135,7 +216,6 @@ var styles = _StyleSheet.default.create({
   }
 });
 
-var _default = (0, _applyLayout.default)((0, _applyNativeMethods.default)(Text));
-
+var _default = Text;
 exports.default = _default;
 module.exports = exports.default;

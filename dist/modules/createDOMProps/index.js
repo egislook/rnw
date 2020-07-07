@@ -13,7 +13,8 @@ import css from '../../exports/StyleSheet/css';
 import StyleSheet from '../../exports/StyleSheet';
 import styleResolver from '../../exports/StyleSheet/styleResolver';
 import { STYLE_GROUPS } from '../../exports/StyleSheet/constants';
-var emptyObject = {}; // Reset styles for heading, link, and list DOM elements
+var emptyObject = {};
+var hasOwnProperty = Object.prototype.hasOwnProperty; // Reset styles for heading, link, and list DOM elements
 
 var classes = css.create({
   reset: {
@@ -44,15 +45,7 @@ var pointerEventsStyles = StyleSheet.create({
   }
 });
 
-var defaultStyleResolver = function defaultStyleResolver(style, classList) {
-  return styleResolver.resolve(style, classList);
-};
-
-var createDOMProps = function createDOMProps(component, props, styleResolver) {
-  if (!styleResolver) {
-    styleResolver = defaultStyleResolver;
-  }
-
+var createDOMProps = function createDOMProps(component, props) {
   if (!props) {
     props = emptyObject;
   }
@@ -60,22 +53,36 @@ var createDOMProps = function createDOMProps(component, props, styleResolver) {
   var _props = props,
       accessibilityLabel = _props.accessibilityLabel,
       accessibilityLiveRegion = _props.accessibilityLiveRegion,
-      accessibilityRelationship = _props.accessibilityRelationship,
       accessibilityState = _props.accessibilityState,
+      accessibilityValue = _props.accessibilityValue,
+      accessible = _props.accessible,
       classList = _props.classList,
-      deprecatedClassName = _props.className,
+      dataSet = _props.dataSet,
       providedDisabled = _props.disabled,
       importantForAccessibility = _props.importantForAccessibility,
       nativeID = _props.nativeID,
       pointerEvents = _props.pointerEvents,
       providedStyle = _props.style,
       testID = _props.testID,
-      accessible = _props.accessible,
       accessibilityRole = _props.accessibilityRole,
-      domProps = _objectWithoutPropertiesLoose(_props, ["accessibilityLabel", "accessibilityLiveRegion", "accessibilityRelationship", "accessibilityState", "classList", "className", "disabled", "importantForAccessibility", "nativeID", "pointerEvents", "style", "testID", "accessible", "accessibilityRole"]);
+      domProps = _objectWithoutPropertiesLoose(_props, ["accessibilityLabel", "accessibilityLiveRegion", "accessibilityState", "accessibilityValue", "accessible", "classList", "dataSet", "disabled", "importantForAccessibility", "nativeID", "pointerEvents", "style", "testID", "accessibilityRole"]);
 
   var disabled = accessibilityState != null && accessibilityState.disabled === true || providedDisabled;
-  var role = AccessibilityUtil.propsToAriaRole(props); // accessibilityLabel
+  var role = AccessibilityUtil.propsToAriaRole(props);
+  var isNativeInteractiveElement = role === 'link' || component === 'a' || component === 'button' || component === 'input' || component === 'select' || component === 'textarea' || domProps.contentEditable != null; // dataSet
+
+  if (dataSet != null) {
+    for (var prop in dataSet) {
+      if (hasOwnProperty.call(dataSet, prop)) {
+        var value = dataSet[prop];
+
+        if (value != null) {
+          domProps["data-" + prop] = value;
+        }
+      }
+    }
+  } // accessibilityLabel
+
 
   if (accessibilityLabel != null) {
     domProps['aria-label'] = accessibilityLabel;
@@ -84,17 +91,6 @@ var createDOMProps = function createDOMProps(component, props, styleResolver) {
 
   if (accessibilityLiveRegion != null) {
     domProps['aria-live'] = accessibilityLiveRegion === 'none' ? 'off' : accessibilityLiveRegion;
-  } // accessibilityRelationship
-
-
-  if (accessibilityRelationship != null) {
-    for (var prop in accessibilityRelationship) {
-      var value = accessibilityRelationship[prop];
-
-      if (value != null) {
-        domProps["aria-" + prop] = value;
-      }
-    }
   } // accessibilityRole
 
 
@@ -119,6 +115,17 @@ var createDOMProps = function createDOMProps(component, props, styleResolver) {
         }
       }
     }
+  } // accessibilityValue
+
+
+  if (accessibilityValue != null) {
+    for (var _prop2 in accessibilityValue) {
+      var _value2 = accessibilityValue[_prop2];
+
+      if (_value2 != null) {
+        domProps["aria-value" + _prop2] = _value2;
+      }
+    }
   } // legacy fallbacks
 
 
@@ -136,13 +143,13 @@ var createDOMProps = function createDOMProps(component, props, styleResolver) {
 
   var focusable = !disabled && importantForAccessibility !== 'no' && importantForAccessibility !== 'no-hide-descendants';
 
-  if (role === 'link' || component === 'a' || component === 'button' || component === 'input' || component === 'select' || component === 'textarea') {
+  if (isNativeInteractiveElement) {
     if (accessible === false || !focusable) {
       domProps.tabIndex = '-1';
     } else {
       domProps['data-focusable'] = true;
     }
-  } else if (AccessibilityUtil.buttonLikeRoles[role] || role === 'textbox') {
+  } else if (role === 'button' || role === 'menuitem' || role === 'textbox') {
     if (accessible !== false && focusable) {
       domProps['data-focusable'] = true;
       domProps.tabIndex = '0';
@@ -160,11 +167,11 @@ var createDOMProps = function createDOMProps(component, props, styleResolver) {
   var needsCursor = (role === 'button' || role === 'link') && !disabled;
   var needsReset = component === 'a' || component === 'button' || component === 'li' || component === 'ul' || role === 'heading'; // Classic CSS styles
 
-  var finalClassList = [deprecatedClassName, needsReset && classes.reset, needsCursor && classes.cursor, classList]; // Resolve styles
+  var finalClassList = [needsReset && classes.reset, needsCursor && classes.cursor, classList]; // Resolve styles
 
-  var _styleResolver = styleResolver(reactNativeStyle, finalClassList),
-      className = _styleResolver.className,
-      style = _styleResolver.style;
+  var _styleResolver$resolv = styleResolver.resolve(reactNativeStyle, finalClassList),
+      className = _styleResolver$resolv.className,
+      style = _styleResolver$resolv.style;
 
   if (className != null && className !== '') {
     domProps.className = className;
@@ -176,7 +183,7 @@ var createDOMProps = function createDOMProps(component, props, styleResolver) {
   // Native element ID
 
 
-  if (nativeID && nativeID.constructor === String) {
+  if (nativeID != null) {
     domProps.id = nativeID;
   } // Link security
   // https://mathiasbynens.github.io/rel-noopener/
@@ -189,8 +196,43 @@ var createDOMProps = function createDOMProps(component, props, styleResolver) {
   } // Automated test IDs
 
 
-  if (testID && testID.constructor === String) {
+  if (testID != null) {
     domProps['data-testid'] = testID;
+  } // Keyboard accessibility
+  // Button-like roles should trigger 'onClick' if SPACE key is pressed.
+  // Button-like roles should not trigger 'onClick' if they are disabled.
+
+
+  if (domProps['data-focusable']) {
+    var onClick = domProps.onClick;
+
+    if (onClick != null) {
+      if (disabled) {
+        domProps.onClick = undefined;
+      } else if (!isNativeInteractiveElement) {
+        // For native elements that are focusable but don't dispatch 'click' events
+        // for keyboards.
+        var onKeyDown = domProps.onKeyDown;
+
+        domProps.onKeyDown = function (e) {
+          var key = e.key;
+          var isSpacebarKey = key === ' ' || key === 'Spacebar';
+          var isButtonRole = role === 'button' || role === 'menuitem';
+
+          if (onKeyDown != null) {
+            onKeyDown(e);
+          }
+
+          if (key === 'Enter') {
+            onClick(e);
+          } else if (isSpacebarKey && isButtonRole) {
+            onClick(e); // Prevent spacebar scrolling the window
+
+            e.preventDefault();
+          }
+        };
+      }
+    }
   }
 
   return domProps;

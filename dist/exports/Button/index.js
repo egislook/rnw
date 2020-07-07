@@ -1,5 +1,3 @@
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
-
 /**
  * Copyright (c) Nicolas Gallagher.
  * Copyright (c) Facebook, Inc. and its affiliates.
@@ -13,43 +11,26 @@ import StyleSheet from '../StyleSheet';
 import TouchableOpacity from '../TouchableOpacity';
 import Text from '../Text';
 import React from 'react';
-
-var Button =
-/*#__PURE__*/
-function (_React$Component) {
-  _inheritsLoose(Button, _React$Component);
-
-  function Button() {
-    return _React$Component.apply(this, arguments) || this;
-  }
-
-  var _proto = Button.prototype;
-
-  _proto.render = function render() {
-    var _this$props = this.props,
-        accessibilityLabel = _this$props.accessibilityLabel,
-        color = _this$props.color,
-        disabled = _this$props.disabled,
-        onPress = _this$props.onPress,
-        testID = _this$props.testID,
-        title = _this$props.title;
-    return React.createElement(TouchableOpacity, {
-      accessibilityLabel: accessibilityLabel,
-      accessibilityRole: "button",
-      disabled: disabled,
-      onPress: onPress,
-      style: [styles.button, color && {
-        backgroundColor: color
-      }, disabled && styles.buttonDisabled],
-      testID: testID
-    }, React.createElement(Text, {
-      style: [styles.text, disabled && styles.textDisabled]
-    }, title));
-  };
-
-  return Button;
-}(React.Component);
-
+export default function Button(props) {
+  var accessibilityLabel = props.accessibilityLabel,
+      color = props.color,
+      disabled = props.disabled,
+      onPress = props.onPress,
+      testID = props.testID,
+      title = props.title;
+  return React.createElement(TouchableOpacity, {
+    accessibilityLabel: accessibilityLabel,
+    accessibilityRole: "button",
+    disabled: disabled,
+    onPress: onPress,
+    style: [styles.button, color && {
+      backgroundColor: color
+    }, disabled && styles.buttonDisabled],
+    testID: testID
+  }, React.createElement(Text, {
+    style: [styles.text, disabled && styles.textDisabled]
+  }, title));
+}
 var styles = StyleSheet.create({
   button: {
     backgroundColor: '#2196F3',
@@ -69,4 +50,3 @@ var styles = StyleSheet.create({
     color: '#a1a1a1'
   }
 });
-export default Button;

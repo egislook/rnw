@@ -6,8 +6,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 function _objectWithoutPropertiesLoose(source, excluded) { if (source == null) return {}; var target = {}; var sourceKeys = Object.keys(source); var key, i; for (i = 0; i < sourceKeys.length; i++) { key = sourceKeys[i]; if (excluded.indexOf(key) >= 0) continue; target[key] = source[key]; } return target; }
 
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
-
 /**
  * Copyright (c) Nicolas Gallagher.
  * Copyright (c) Facebook, Inc. and its affiliates.
@@ -17,67 +15,55 @@ function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.crea
  *
  * 
  */
-import applyNativeMethods from '../../modules/applyNativeMethods';
-import { Component } from 'react';
 import createElement from '../createElement';
+import setAndForwardRef from '../../modules/setAndForwardRef';
+import usePlatformMethods from '../../hooks/usePlatformMethods';
 import PickerItem from './PickerItem';
 import StyleSheet from '../StyleSheet';
+import { forwardRef, useRef } from 'react';
+var Picker = forwardRef(function (props, forwardedRef) {
+  var children = props.children,
+      enabled = props.enabled,
+      onValueChange = props.onValueChange,
+      selectedValue = props.selectedValue,
+      style = props.style,
+      testID = props.testID,
+      itemStyle = props.itemStyle,
+      mode = props.mode,
+      prompt = props.prompt,
+      other = _objectWithoutPropertiesLoose(props, ["children", "enabled", "onValueChange", "selectedValue", "style", "testID", "itemStyle", "mode", "prompt"]);
 
-var Picker =
-/*#__PURE__*/
-function (_Component) {
-  _inheritsLoose(Picker, _Component);
-
-  function Picker() {
-    var _this;
-
-    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-      args[_key] = arguments[_key];
+  var hostRef = useRef(null);
+  var setRef = setAndForwardRef({
+    getForwardedRef: function getForwardedRef() {
+      return forwardedRef;
+    },
+    setLocalRef: function setLocalRef(hostNode) {
+      hostRef.current = hostNode;
     }
+  });
+  usePlatformMethods(hostRef, [], style);
 
-    _this = _Component.call.apply(_Component, [this].concat(args)) || this;
+  function handleChange(e) {
+    var _e$target = e.target,
+        selectedIndex = _e$target.selectedIndex,
+        value = _e$target.value;
 
-    _this._handleChange = function (e) {
-      var onValueChange = _this.props.onValueChange;
-      var _e$target = e.target,
-          selectedIndex = _e$target.selectedIndex,
-          value = _e$target.value;
-
-      if (onValueChange) {
-        onValueChange(value, selectedIndex);
-      }
-    };
-
-    return _this;
+    if (onValueChange) {
+      onValueChange(value, selectedIndex);
+    }
   }
 
-  var _proto = Picker.prototype;
-
-  _proto.render = function render() {
-    var _this$props = this.props,
-        children = _this$props.children,
-        enabled = _this$props.enabled,
-        selectedValue = _this$props.selectedValue,
-        style = _this$props.style,
-        testID = _this$props.testID,
-        itemStyle = _this$props.itemStyle,
-        mode = _this$props.mode,
-        prompt = _this$props.prompt,
-        onValueChange = _this$props.onValueChange,
-        otherProps = _objectWithoutPropertiesLoose(_this$props, ["children", "enabled", "selectedValue", "style", "testID", "itemStyle", "mode", "prompt", "onValueChange"]);
-
-    return createElement('select', _objectSpread({
-      children: children,
-      disabled: enabled === false ? true : undefined,
-      onChange: this._handleChange,
-      style: [styles.initial, style],
-      testID: testID,
-      value: selectedValue
-    }, otherProps));
-  };
-
-  return Picker;
-}(Component);
+  return createElement('select', _objectSpread({
+    children: children,
+    disabled: enabled === false ? true : undefined,
+    onChange: handleChange,
+    ref: setRef,
+    style: [styles.initial, style],
+    testID: testID,
+    value: selectedValue
+  }, other));
+}); // $FlowFixMe
 
 Picker.Item = PickerItem;
 var styles = StyleSheet.create({
@@ -87,4 +73,4 @@ var styles = StyleSheet.create({
     margin: 0
   }
 });
-export default applyNativeMethods(Picker);
+export default Picker;

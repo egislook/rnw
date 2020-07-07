@@ -1,27 +1,27 @@
 {
-  "_from": "react-native-web@0.12.3",
-  "_id": "react-native-web@0.12.3",
+  "_from": "react-native-web@0.13.0",
+  "_id": "react-native-web@0.13.0",
   "_inBundle": false,
-  "_integrity": "sha512-6evhZl3tzYz5IUesbHEC4/ooUkXJPIAtrmDJWe3CdpDrV6rvBNNa1Utq192YKbHPzGtETuw+5X59K0O1n5EjWQ==",
+  "_integrity": "sha512-u4d4LhgwAQ23fZxhq7yxhUUK8eGl0ER2C/qPHQVKo6dottqkI7b2HxWJtBpWklmY+Vtoo4yGN4m3w6SIyE4MDQ==",
   "_location": "/react-native-web",
   "_phantomChildren": {},
   "_requested": {
     "type": "version",
     "registry": true,
-    "raw": "react-native-web@0.12.3",
+    "raw": "react-native-web@0.13.0",
     "name": "react-native-web",
     "escapedName": "react-native-web",
-    "rawSpec": "0.12.3",
+    "rawSpec": "0.13.0",
     "saveSpec": null,
-    "fetchSpec": "0.12.3"
+    "fetchSpec": "0.13.0"
   },
   "_requiredBy": [
     "#USER",
     "/"
   ],
-  "_resolved": "https://registry.npmjs.org/react-native-web/-/react-native-web-0.12.3.tgz",
-  "_shasum": "9f43301539672d46a302ee642afd29243a4376d5",
-  "_spec": "react-native-web@0.12.3",
+  "_resolved": "https://registry.npmjs.org/react-native-web/-/react-native-web-0.13.0.tgz",
+  "_shasum": "02ea5d2bcf06891b61596cd3f9492acffad0b1d9",
+  "_spec": "react-native-web@0.13.0",
   "_where": "C:\\Users\\Egis\\Desktop\\DEV\\act\\web",
   "author": {
     "name": "Nicolas Gallagher"
@@ -77,5 +77,5 @@
   "tags": [
     "react"
   ],
-  "version": "0.12.3"
+  "version": "0.13.0"
 }

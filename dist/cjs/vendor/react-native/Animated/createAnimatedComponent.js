@@ -20,6 +20,8 @@ var _react = _interopRequireDefault(require("react"));
 
 var _invariant = _interopRequireDefault(require("fbjs/lib/invariant"));
 
+var _setAndForwardRef = _interopRequireDefault(require("../../../modules/setAndForwardRef"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
@@ -58,11 +60,24 @@ function createAnimatedComponent(Component, defaultProps) {
         }
       };
 
-      _this._setComponentRef = function (c) {
-        _this._prevComponent = _this._component;
-        _this._component = c;
-      };
+      _this._setComponentRef = (0, _setAndForwardRef.default)({
+        getForwardedRef: function getForwardedRef() {
+          return _this.props.forwardedRef;
+        },
+        setLocalRef: function setLocalRef(ref) {
+          _this._prevComponent = _this._component;
+          _this._component = ref; // TODO: Delete this in a future release.
 
+          if (ref != null && ref.getNode == null) {
+            ref.getNode = function () {
+              var _ref$constructor$name;
+
+              console.warn('%s: Calling `getNode()` on the ref of an Animated component ' + 'is no longer necessary. You can now directly use the ref ' + 'instead. This method will be removed in a future release.', (_ref$constructor$name = ref.constructor.name) !== null && _ref$constructor$name !== void 0 ? _ref$constructor$name : '<<anonymous>>');
+              return ref;
+            };
+          }
+        }
+      });
       return _this;
     }
 
@@ -72,10 +87,6 @@ function createAnimatedComponent(Component, defaultProps) {
       this._propsAnimated && this._propsAnimated.__detach();
 
       this._detachNativeEvents();
-    };
-
-    _proto.setNativeProps = function setNativeProps(props) {
-      this._component.setNativeProps(props);
     };
 
     _proto.UNSAFE_componentWillMount = function UNSAFE_componentWillMount() {
@@ -174,18 +185,16 @@ function createAnimatedComponent(Component, defaultProps) {
       }));
     };
 
-    // A third party library can use getNode()
-    // to get the node reference of the decorated component
-    _proto.getNode = function getNode() {
-      return this._component;
-    };
-
     return AnimatedComponent;
   }(_react.default.Component);
 
   AnimatedComponent.__skipSetNativeProps_FOR_TESTS_ONLY = false;
   var propTypes = Component.propTypes;
-  return AnimatedComponent;
+  return _react.default.forwardRef(function AnimatedComponentWrapper(props, ref) {
+    return _react.default.createElement(AnimatedComponent, _extends({}, props, ref == null ? null : {
+      forwardedRef: ref
+    }));
+  });
 }
 
 var _default = createAnimatedComponent;

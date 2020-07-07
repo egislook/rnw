@@ -1,5 +1,3 @@
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
-
 /**
  * Copyright (c) Nicolas Gallagher.
  * Copyright (c) Facebook, Inc. and its affiliates.
@@ -9,78 +7,133 @@ function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.crea
  *
  *
  */
-import applyLayout from '../../modules/applyLayout';
-import applyNativeMethods from '../../modules/applyNativeMethods';
+import * as React from 'react';
+import { forwardRef, useContext, useRef } from 'react';
 import createElement from '../createElement';
 import css from '../StyleSheet/css';
-import filterSupportedProps from './filterSupportedProps';
+import pick from '../../modules/pick';
+import setAndForwardRef from '../../modules/setAndForwardRef';
+import useElementLayout from '../../hooks/useElementLayout';
+import usePlatformMethods from '../../hooks/usePlatformMethods';
+import useResponderEvents from '../../hooks/useResponderEvents';
 import StyleSheet from '../StyleSheet';
 import TextAncestorContext from '../Text/TextAncestorContext';
-import React from 'react';
-
-var calculateHitSlopStyle = function calculateHitSlopStyle(hitSlop) {
-  var hitStyle = {};
-
-  for (var prop in hitSlop) {
-    if (hitSlop.hasOwnProperty(prop)) {
-      var value = hitSlop[prop];
-      hitStyle[prop] = value > 0 ? -1 * value : 0;
-    }
-  }
-
-  return hitStyle;
+var forwardPropsList = {
+  accessibilityLabel: true,
+  accessibilityLiveRegion: true,
+  accessibilityRole: true,
+  accessibilityState: true,
+  accessibilityValue: true,
+  accessible: true,
+  children: true,
+  classList: true,
+  disabled: true,
+  importantForAccessibility: true,
+  nativeID: true,
+  onBlur: true,
+  onClick: true,
+  onClickCapture: true,
+  onContextMenu: true,
+  onFocus: true,
+  onKeyDown: true,
+  onKeyUp: true,
+  onTouchCancel: true,
+  onTouchCancelCapture: true,
+  onTouchEnd: true,
+  onTouchEndCapture: true,
+  onTouchMove: true,
+  onTouchMoveCapture: true,
+  onTouchStart: true,
+  onTouchStartCapture: true,
+  pointerEvents: true,
+  ref: true,
+  style: true,
+  testID: true,
+  // unstable
+  dataSet: true,
+  onMouseDown: true,
+  onMouseEnter: true,
+  onMouseLeave: true,
+  onMouseMove: true,
+  onMouseOver: true,
+  onMouseOut: true,
+  onMouseUp: true,
+  onScroll: true,
+  onWheel: true,
+  href: true,
+  rel: true,
+  target: true
 };
 
-var View =
-/*#__PURE__*/
-function (_React$Component) {
-  _inheritsLoose(View, _React$Component);
+var pickProps = function pickProps(props) {
+  return pick(props, forwardPropsList);
+};
 
-  function View() {
-    return _React$Component.apply(this, arguments) || this;
+var View = forwardRef(function (props, forwardedRef) {
+  var onLayout = props.onLayout,
+      onMoveShouldSetResponder = props.onMoveShouldSetResponder,
+      onMoveShouldSetResponderCapture = props.onMoveShouldSetResponderCapture,
+      onResponderEnd = props.onResponderEnd,
+      onResponderGrant = props.onResponderGrant,
+      onResponderMove = props.onResponderMove,
+      onResponderReject = props.onResponderReject,
+      onResponderRelease = props.onResponderRelease,
+      onResponderStart = props.onResponderStart,
+      onResponderTerminate = props.onResponderTerminate,
+      onResponderTerminationRequest = props.onResponderTerminationRequest,
+      onScrollShouldSetResponder = props.onScrollShouldSetResponder,
+      onScrollShouldSetResponderCapture = props.onScrollShouldSetResponderCapture,
+      onSelectionChangeShouldSetResponder = props.onSelectionChangeShouldSetResponder,
+      onSelectionChangeShouldSetResponderCapture = props.onSelectionChangeShouldSetResponderCapture,
+      onStartShouldSetResponder = props.onStartShouldSetResponder,
+      onStartShouldSetResponderCapture = props.onStartShouldSetResponderCapture;
+
+  if (process.env.NODE_ENV !== 'production') {
+    React.Children.toArray(props.children).forEach(function (item) {
+      if (typeof item === 'string') {
+        console.error("Unexpected text node: " + item + ". A text node cannot be a child of a <View>.");
+      }
+    });
   }
 
-  var _proto = View.prototype;
-
-  _proto.renderView = function renderView(hasTextAncestor) {
-    var hitSlop = this.props.hitSlop;
-    var supportedProps = filterSupportedProps(this.props);
-
-    if (process.env.NODE_ENV !== 'production') {
-      React.Children.toArray(this.props.children).forEach(function (item) {
-        if (typeof item === 'string') {
-          console.error("Unexpected text node: " + item + ". A text node cannot be a child of a <View>.");
-        }
-      });
+  var hasTextAncestor = useContext(TextAncestorContext);
+  var hostRef = useRef(null);
+  var setRef = setAndForwardRef({
+    getForwardedRef: function getForwardedRef() {
+      return forwardedRef;
+    },
+    setLocalRef: function setLocalRef(hostNode) {
+      hostRef.current = hostNode;
     }
-
-    supportedProps.classList = [classes.view, this.props.classList];
-    supportedProps.ref = this.props.forwardedRef;
-    supportedProps.style = StyleSheet.compose(hasTextAncestor && styles.inline, this.props.style);
-
-    if (hitSlop) {
-      var hitSlopStyle = calculateHitSlopStyle(hitSlop);
-      var hitSlopChild = createElement('span', {
-        classList: [classes.hitSlop],
-        style: hitSlopStyle
-      });
-      supportedProps.children = React.Children.toArray([hitSlopChild, supportedProps.children]);
-    }
-
-    return createElement('div', supportedProps);
-  };
-
-  _proto.render = function render() {
-    var _this = this;
-
-    return React.createElement(TextAncestorContext.Consumer, null, function (hasTextAncestor) {
-      return _this.renderView(hasTextAncestor);
-    });
-  };
-
-  return View;
-}(React.Component);
-
+  });
+  var classList = [classes.view, props.classList];
+  var style = StyleSheet.compose(hasTextAncestor && styles.inline, props.style);
+  useElementLayout(hostRef, onLayout);
+  usePlatformMethods(hostRef, classList, style);
+  useResponderEvents(hostRef, {
+    onMoveShouldSetResponder: onMoveShouldSetResponder,
+    onMoveShouldSetResponderCapture: onMoveShouldSetResponderCapture,
+    onResponderEnd: onResponderEnd,
+    onResponderGrant: onResponderGrant,
+    onResponderMove: onResponderMove,
+    onResponderReject: onResponderReject,
+    onResponderRelease: onResponderRelease,
+    onResponderStart: onResponderStart,
+    onResponderTerminate: onResponderTerminate,
+    onResponderTerminationRequest: onResponderTerminationRequest,
+    onScrollShouldSetResponder: onScrollShouldSetResponder,
+    onScrollShouldSetResponderCapture: onScrollShouldSetResponderCapture,
+    onSelectionChangeShouldSetResponder: onSelectionChangeShouldSetResponder,
+    onSelectionChangeShouldSetResponderCapture: onSelectionChangeShouldSetResponderCapture,
+    onStartShouldSetResponder: onStartShouldSetResponder,
+    onStartShouldSetResponderCapture: onStartShouldSetResponderCapture
+  });
+  var supportedProps = pickProps(props);
+  supportedProps.classList = classList;
+  supportedProps.ref = setRef;
+  supportedProps.style = style;
+  return createElement('div', supportedProps);
+});
 View.displayName = 'View';
 var classes = css.create({
   view: {
@@ -97,16 +150,6 @@ var classes = css.create({
     padding: 0,
     position: 'relative',
     zIndex: 0
-  },
-  // this zIndex-ordering positions the hitSlop above the View but behind
-  // its children
-  hitSlop: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    zIndex: -1
   }
 });
 var styles = StyleSheet.create({
@@ -114,4 +157,4 @@ var styles = StyleSheet.create({
     display: 'inline-flex'
   }
 });
-export default applyLayout(applyNativeMethods(View));
+export default View;

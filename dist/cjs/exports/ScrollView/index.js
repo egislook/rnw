@@ -7,8 +7,6 @@ var _createReactClass = _interopRequireDefault(require("create-react-class"));
 
 var _dismissKeyboard = _interopRequireDefault(require("../../modules/dismissKeyboard"));
 
-var _findNodeHandle = _interopRequireDefault(require("../findNodeHandle"));
-
 var _invariant = _interopRequireDefault(require("fbjs/lib/invariant"));
 
 var _ScrollResponder = _interopRequireDefault(require("../../modules/ScrollResponder"));
@@ -46,8 +44,8 @@ var ScrollView = (0, _createReactClass.default)({
     this.scrollResponderFlashScrollIndicators();
   },
   setNativeProps: function setNativeProps(props) {
-    if (this._scrollViewRef) {
-      this._scrollViewRef.setNativeProps(props);
+    if (this._scrollNodeRef) {
+      this._scrollNodeRef.setNativeProps(props);
     }
   },
 
@@ -61,10 +59,10 @@ var ScrollView = (0, _createReactClass.default)({
     return this;
   },
   getScrollableNode: function getScrollableNode() {
-    return (0, _findNodeHandle.default)(this._scrollViewRef);
+    return this._scrollNodeRef;
   },
   getInnerViewNode: function getInnerViewNode() {
-    return (0, _findNodeHandle.default)(this._innerViewRef);
+    return this._innerViewRef;
   },
 
   /**
@@ -115,26 +113,6 @@ var ScrollView = (0, _createReactClass.default)({
       x: x,
       y: y,
       animated: animated
-    });
-  },
-
-  /**
-   * Deprecated, do not use.
-   */
-  scrollWithoutAnimationTo: function scrollWithoutAnimationTo(y, x) {
-    if (y === void 0) {
-      y = 0;
-    }
-
-    if (x === void 0) {
-      x = 0;
-    }
-
-    console.warn('`scrollWithoutAnimationTo` is deprecated. Use `scrollTo` instead');
-    this.scrollTo({
-      x: x,
-      y: y,
-      animated: false
     });
   },
   render: function render() {
@@ -214,15 +192,15 @@ var ScrollView = (0, _createReactClass.default)({
 
     if (refreshControl) {
       return _react.default.cloneElement(refreshControl, {
-        style: props.style
+        style: props.style,
       }, _react.default.createElement(ScrollViewClass, _extends({}, props, {
-        ref: this._setScrollViewRef,
+        ref: this._setScrollNodeRef,
         style: baseStyle
       }), contentContainer));
     }
 
     return _react.default.createElement(ScrollViewClass, _extends({}, props, {
-      ref: this._setScrollViewRef
+      ref: this._setScrollNodeRef
     }), contentContainer);
   },
   _handleContentOnLayout: function _handleContentOnLayout(e) {
@@ -247,8 +225,8 @@ var ScrollView = (0, _createReactClass.default)({
   _setInnerViewRef: function _setInnerViewRef(component) {
     this._innerViewRef = component;
   },
-  _setScrollViewRef: function _setScrollViewRef(component) {
-    this._scrollViewRef = component;
+  _setScrollNodeRef: function _setScrollNodeRef(component) {
+    this._scrollNodeRef = component;
   }
 });
 var commonStyle = {

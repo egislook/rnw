@@ -8,13 +8,15 @@ var _AppContainer = _interopRequireDefault(require("./AppContainer"));
 
 var _invariant = _interopRequireDefault(require("fbjs/lib/invariant"));
 
-var _hydrate = _interopRequireDefault(require("../../modules/hydrate"));
-
-var _render = _interopRequireDefault(require("../render"));
+var _render = _interopRequireWildcard(require("../render"));
 
 var _styleResolver = _interopRequireDefault(require("../StyleSheet/styleResolver"));
 
 var _react = _interopRequireDefault(require("react"));
+
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function _getRequireWildcardCache() { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -24,7 +26,7 @@ function renderApplication(RootComponent, WrapperComponent, callback, options) {
   var shouldHydrate = options.hydrate,
       initialProps = options.initialProps,
       rootTag = options.rootTag;
-  var renderFn = shouldHydrate ? _hydrate.default : _render.default;
+  var renderFn = shouldHydrate ? _render.hydrate : _render.default;
   (0, _invariant.default)(rootTag, 'Expect to have a valid rootTag, instead got ', rootTag);
   renderFn(_react.default.createElement(_AppContainer.default, {
     rootTag: rootTag,

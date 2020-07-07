@@ -6,7 +6,7 @@
  *
  * 
  */
-import ReactNativePropRegistry from '../../modules/ReactNativePropRegistry';
+import ReactNativePropRegistry from './ReactNativePropRegistry';
 import flattenStyle from './flattenStyle';
 var absoluteFillObject = {
   position: 'absolute',

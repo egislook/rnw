@@ -1,5 +1,3 @@
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
-
 /**
  * Copyright (c) Nicolas Gallagher.
  * Copyright (c) Facebook, Inc. and its affiliates.
@@ -9,83 +7,151 @@ function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.crea
  *
  * 
  */
-import applyLayout from '../../modules/applyLayout';
-import applyNativeMethods from '../../modules/applyNativeMethods';
+import * as React from 'react';
+import { forwardRef, useContext, useRef } from 'react';
 import createElement from '../createElement';
 import css from '../StyleSheet/css';
-import filterSupportedProps from '../View/filterSupportedProps';
-import React from 'react';
+import pick from '../../modules/pick';
+import setAndForwardRef from '../../modules/setAndForwardRef';
+import useElementLayout from '../../hooks/useElementLayout';
+import usePlatformMethods from '../../hooks/usePlatformMethods';
+import useResponderEvents from '../../hooks/useResponderEvents';
 import StyleSheet from '../StyleSheet';
 import TextAncestorContext from './TextAncestorContext';
+var forwardPropsList = {
+  accessibilityLabel: true,
+  accessibilityLiveRegion: true,
+  accessibilityRole: true,
+  accessibilityState: true,
+  accessibilityValue: true,
+  accessible: true,
+  children: true,
+  classList: true,
+  dir: true,
+  importantForAccessibility: true,
+  lang: true,
+  nativeID: true,
+  onBlur: true,
+  onClick: true,
+  onClickCapture: true,
+  onContextMenu: true,
+  onFocus: true,
+  onKeyDown: true,
+  onKeyUp: true,
+  onTouchCancel: true,
+  onTouchCancelCapture: true,
+  onTouchEnd: true,
+  onTouchEndCapture: true,
+  onTouchMove: true,
+  onTouchMoveCapture: true,
+  onTouchStart: true,
+  onTouchStartCapture: true,
+  pointerEvents: true,
+  ref: true,
+  style: true,
+  testID: true,
+  // unstable
+  dataSet: true,
+  onMouseDown: true,
+  onMouseEnter: true,
+  onMouseLeave: true,
+  onMouseMove: true,
+  onMouseOver: true,
+  onMouseOut: true,
+  onMouseUp: true,
+  onScroll: true,
+  onWheel: true,
+  href: true,
+  rel: true,
+  target: true
+};
 
-var Text =
-/*#__PURE__*/
-function (_React$Component) {
-  _inheritsLoose(Text, _React$Component);
+var pickProps = function pickProps(props) {
+  return pick(props, forwardPropsList);
+};
 
-  function Text() {
-    return _React$Component.apply(this, arguments) || this;
-  }
+var Text = forwardRef(function (props, forwardedRef) {
+  var dir = props.dir,
+      numberOfLines = props.numberOfLines,
+      onClick = props.onClick,
+      onLayout = props.onLayout,
+      onPress = props.onPress,
+      onMoveShouldSetResponder = props.onMoveShouldSetResponder,
+      onMoveShouldSetResponderCapture = props.onMoveShouldSetResponderCapture,
+      onResponderEnd = props.onResponderEnd,
+      onResponderGrant = props.onResponderGrant,
+      onResponderMove = props.onResponderMove,
+      onResponderReject = props.onResponderReject,
+      onResponderRelease = props.onResponderRelease,
+      onResponderStart = props.onResponderStart,
+      onResponderTerminate = props.onResponderTerminate,
+      onResponderTerminationRequest = props.onResponderTerminationRequest,
+      onScrollShouldSetResponder = props.onScrollShouldSetResponder,
+      onScrollShouldSetResponderCapture = props.onScrollShouldSetResponderCapture,
+      onSelectionChangeShouldSetResponder = props.onSelectionChangeShouldSetResponder,
+      onSelectionChangeShouldSetResponderCapture = props.onSelectionChangeShouldSetResponderCapture,
+      onStartShouldSetResponder = props.onStartShouldSetResponder,
+      onStartShouldSetResponderCapture = props.onStartShouldSetResponderCapture,
+      selectable = props.selectable;
+  var hasTextAncestor = useContext(TextAncestorContext);
+  var hostRef = useRef(null);
+  var setRef = setAndForwardRef({
+    getForwardedRef: function getForwardedRef() {
+      return forwardedRef;
+    },
+    setLocalRef: function setLocalRef(hostNode) {
+      hostRef.current = hostNode;
+    }
+  });
+  var classList = [classes.text, hasTextAncestor === true && classes.textHasAncestor, numberOfLines === 1 && classes.textOneLine, numberOfLines != null && numberOfLines > 1 && classes.textMultiLine];
+  var style = [props.style, numberOfLines != null && numberOfLines > 1 && {
+    WebkitLineClamp: numberOfLines
+  }, selectable === false && styles.notSelectable, onPress && styles.pressable];
+  useElementLayout(hostRef, onLayout);
+  usePlatformMethods(hostRef, classList, style);
+  useResponderEvents(hostRef, {
+    onMoveShouldSetResponder: onMoveShouldSetResponder,
+    onMoveShouldSetResponderCapture: onMoveShouldSetResponderCapture,
+    onResponderEnd: onResponderEnd,
+    onResponderGrant: onResponderGrant,
+    onResponderMove: onResponderMove,
+    onResponderReject: onResponderReject,
+    onResponderRelease: onResponderRelease,
+    onResponderStart: onResponderStart,
+    onResponderTerminate: onResponderTerminate,
+    onResponderTerminationRequest: onResponderTerminationRequest,
+    onScrollShouldSetResponder: onScrollShouldSetResponder,
+    onScrollShouldSetResponderCapture: onScrollShouldSetResponderCapture,
+    onSelectionChangeShouldSetResponder: onSelectionChangeShouldSetResponder,
+    onSelectionChangeShouldSetResponderCapture: onSelectionChangeShouldSetResponderCapture,
+    onStartShouldSetResponder: onStartShouldSetResponder,
+    onStartShouldSetResponderCapture: onStartShouldSetResponderCapture
+  });
 
-  var _proto = Text.prototype;
-
-  _proto.renderText = function renderText(hasTextAncestor) {
-    var _this$props = this.props,
-        dir = _this$props.dir,
-        forwardedRef = _this$props.forwardedRef,
-        numberOfLines = _this$props.numberOfLines,
-        onPress = _this$props.onPress,
-        selectable = _this$props.selectable,
-        style = _this$props.style;
-    var supportedProps = filterSupportedProps(this.props);
-
-    if (onPress) {
-      supportedProps.accessible = true;
-      supportedProps.onClick = this._createPressHandler(onPress);
-      supportedProps.onKeyDown = this._createEnterHandler(onPress);
+  function handleClick(e) {
+    if (onClick != null) {
+      onClick(e);
     }
 
-    supportedProps.classList = [classes.text, hasTextAncestor === true && classes.textHasAncestor, numberOfLines === 1 && classes.textOneLine, numberOfLines != null && numberOfLines > 1 && classes.textMultiLine]; // allow browsers to automatically infer the language writing direction
-
-    supportedProps.dir = dir !== undefined ? dir : 'auto';
-    supportedProps.ref = forwardedRef;
-    supportedProps.style = [style, numberOfLines != null && numberOfLines > 1 && {
-      WebkitLineClamp: numberOfLines
-    }, selectable === false && styles.notSelectable, onPress && styles.pressable];
-    var component = hasTextAncestor ? 'span' : 'div';
-    return createElement(component, supportedProps);
-  };
-
-  _proto.render = function render() {
-    var _this = this;
-
-    return React.createElement(TextAncestorContext.Consumer, null, function (hasTextAncestor) {
-      var element = _this.renderText(hasTextAncestor);
-
-      return hasTextAncestor ? element : React.createElement(TextAncestorContext.Provider, {
-        value: true
-      }, element);
-    });
-  };
-
-  _proto._createEnterHandler = function _createEnterHandler(fn) {
-    return function (e) {
-      if (e.keyCode === 13) {
-        fn && fn(e);
-      }
-    };
-  };
-
-  _proto._createPressHandler = function _createPressHandler(fn) {
-    return function (e) {
+    if (onClick == null && onPress != null) {
       e.stopPropagation();
-      fn && fn(e);
-    };
-  };
+      onPress(e);
+    }
+  }
 
-  return Text;
-}(React.Component);
+  var component = hasTextAncestor ? 'span' : 'div';
+  var supportedProps = pickProps(props);
+  supportedProps.classList = classList; // 'auto' by default allows browsers to infer writing direction
 
+  supportedProps.dir = dir !== undefined ? dir : 'auto';
+  supportedProps.onClick = handleClick;
+  supportedProps.ref = setRef;
+  supportedProps.style = style;
+  var element = createElement(component, supportedProps);
+  return hasTextAncestor ? element : React.createElement(TextAncestorContext.Provider, {
+    value: true
+  }, element);
+});
 Text.displayName = 'Text';
 var classes = css.create({
   text: {
@@ -127,4 +193,4 @@ var styles = StyleSheet.create({
     cursor: 'pointer'
   }
 });
-export default applyLayout(applyNativeMethods(Text));
+export default Text;

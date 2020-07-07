@@ -11,8 +11,7 @@ function _extends() { _extends = Object.assign || function (target) { for (var i
  */
 import AppContainer from './AppContainer';
 import invariant from 'fbjs/lib/invariant';
-import hydrate from '../../modules/hydrate';
-import render from '../render';
+import render, { hydrate } from '../render';
 import styleResolver from '../StyleSheet/styleResolver';
 import React from 'react';
 export default function renderApplication(RootComponent, WrapperComponent, callback, options) {
